@@ -1,8 +1,8 @@
 import cors from "cors";
-import express from "express";
+import express, { Application } from "express";
 import userRoutes from "./routes/users.routes.js";
 
-const app = express();
+const app: Application = express();
 
 // Middlewares
 app.use(cors());

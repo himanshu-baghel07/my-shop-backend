@@ -1,6 +1,14 @@
 import { pool } from "../config/database.config.js";
 import logger from "../utils/logger.js";
 
+interface CreateUserInput {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  role: string;
+}
+
 export const getAllUserService = async () => {
   logger.info("DB query - Fetching all users");
   const result = await pool.query(
@@ -11,7 +19,7 @@ export const getAllUserService = async () => {
   return result;
 };
 
-export const getUserService = async (id) => {
+export const getUserService = async (id: string) => {
   logger.info(`DB query - Fetching user by ID: ${id}`);
   const result = await pool.query(
     `SELECT "userId", name, email, phone, role,  "createdAt"
@@ -21,7 +29,7 @@ export const getUserService = async (id) => {
   return result;
 };
 
-export const createUserService = async (user) => {
+export const createUserService = async (user: CreateUserInput) => {
   const { name, email, password, phone, role } = user;
   logger.info(`DB query - Inserting new user with email: ${email}`);
   const result = await pool.query(

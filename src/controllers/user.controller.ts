@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import {
   createUserService,
   getAllUserService,
@@ -5,7 +6,10 @@ import {
 } from "../services/user.service.js";
 import logger from "../utils/logger.js";
 
-export const getAllUserController = async (req, res) => {
+export const getAllUserController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     logger.info("GET /users - Fetching all users");
     const allUsers = await getAllUserService();
@@ -18,24 +22,28 @@ export const getAllUserController = async (req, res) => {
       totalCount: allUsers.rowCount,
     });
   } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
     logger.error("Error fetching users", {
-      message: error.message,
-      stack: error.stack,
+      message: err.message,
+      stack: err.stack,
     });
     res.status(500).json({ error: "Server error" });
   }
 };
-export const getUserController = async (req, res) => {
+export const getUserController = async (
+  _req: Request,
+  res: Response,
+): Promise<void> => {
   try {
-    const { id } = req.params;
+    const { id } = _req.params as { id: string };
+
     logger.info(`GET /users/${id} - Fetching user by ID`);
     const user = await getUserService(id);
 
     if (user.rowCount === 0) {
       logger.warn(`User not found with ID: ${id}`);
-      return res
-        .status(404)
-        .json({ status: "Not Found", message: "User not found" });
+      res.status(404).json({ status: "Not Found", message: "User not found" });
+      return;
     }
 
     logger.info(`User fetched successfully. ID: ${id}`);
@@ -45,23 +53,41 @@ export const getUserController = async (req, res) => {
       totalCount: user.rowCount,
     });
   } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
     logger.error(`Error fetching user by ID`, {
-      message: error.message,
-      stack: error.stack,
+      message: err.message,
+      stack: err.stack,
     });
     res.status(500).json({ error: "Server error" });
   }
 };
 
-export const createUserController = async (req, res) => {
+export const createUserController = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     logger.info("POST /users - Create user request received", {
       body: req.body,
     });
 
-    const request = req.body;
+    const { name, email, password, phone, role } = req.body;
 
-    const newUser = await createUserService(request);
+    if (!name || !email || !password || !phone || !role) {
+      res.status(400).json({
+        success: false,
+        message: "Missing required fields: name, email, password, phone, role",
+      });
+      return;
+    }
+
+    const newUser = await createUserService({
+      name,
+      email,
+      password,
+      phone,
+      role,
+    });
     const user = newUser.rows[0];
 
     const { password: _, ...safeUser } = user;
@@ -76,22 +102,25 @@ export const createUserController = async (req, res) => {
       data: safeUser,
     });
   } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    const pgError = error as { code?: string };
     // Duplicate email error (PostgreSQL)
-    if (error.code === "23505") {
+    if (pgError.code === "23505") {
       logger.warn("User creation failed - Duplicate email", {
         email: req.body.email,
       });
 
-      return res.status(409).json({
+      res.status(409).json({
         success: false,
         message: "User already exists with this email",
       });
+      return;
     }
 
     // Unexpected error
     logger.error("User creation failed - Server error", {
-      message: error.message,
-      stack: error.stack,
+      message: err.message,
+      stack: err.stack,
     });
 
     res.status(500).json({
