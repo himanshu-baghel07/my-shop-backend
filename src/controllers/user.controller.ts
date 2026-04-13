@@ -7,7 +7,7 @@ import {
 import logger from "../utils/logger.js";
 
 export const getAllUserController = async (
-  req: Request,
+  _req: Request,
   res: Response,
 ): Promise<void> => {
   try {
