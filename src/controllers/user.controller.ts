@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { CreateUserInput } from "../schema/user.schema.js";
 import {
   createUserService,
   getAllUserService,
@@ -71,15 +72,7 @@ export const createUserController = async (
       body: req.body,
     });
 
-    const { name, email, password, phone, role } = req.body;
-
-    if (!name || !email || !password || !phone || !role) {
-      res.status(400).json({
-        success: false,
-        message: "Missing required fields: name, email, password, phone, role",
-      });
-      return;
-    }
+    const { name, email, password, phone, role } = req.body as CreateUserInput;
 
     const newUser = await createUserService({
       name,
