@@ -4,16 +4,17 @@ import {
   getAllUserController,
   getUserController,
 } from "../controllers/user.controller.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
 import { validate } from "../middleware/validate.middleware.js";
 import { createUserSchema } from "../schema/user.schema.js";
 
 const router = express.Router();
 
 // GET all users
-router.get("/", getAllUserController);
+router.get("/", authMiddleware, getAllUserController);
 
 // GET single user
-router.get("/:id", getUserController);
+router.get("/:id", authMiddleware, getUserController);
 
 // POST create user
 router.post("/", validate(createUserSchema), createUserController);

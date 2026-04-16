@@ -1,3 +1,4 @@
+import * as bcrypt from "bcrypt";
 import { pool } from "../config/database.config.js";
 import logger from "../utils/logger.js";
 
@@ -31,10 +32,11 @@ export const getUserService = async (id: string) => {
 
 export const createUserService = async (user: CreateUserInput) => {
   const { name, email, password, phone, role } = user;
+  const hashedPassword = await bcrypt.hash(password, 10);
   logger.info(`DB query - Inserting new user with email: ${email}`);
   const result = await pool.query(
     `INSERT INTO users (name,email,password,phone,role) VALUES($1,$2,$3,$4,$5) RETURNING * `,
-    [name, email, password, phone, role],
+    [name, email, hashedPassword, phone, role],
   );
   logger.info(
     `DB query complete - User inserted with ID: ${result.rows[0]?.userId}`,
