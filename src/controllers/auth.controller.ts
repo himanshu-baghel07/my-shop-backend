@@ -20,8 +20,26 @@ export const loginUserController = async (
 
     const { token } = await loginUserService({ email, password });
 
-    res.status(200).json({ success: true, token });
+    res.cookie("token", token, {
+      httpOnly: false, // For Production true
+      secure: true,
+      sameSite: "lax", //For Production strict
+      maxAge: 24 * 60 * 60 * 1000,
+      // maxAge: 1 * 60 * 1000,
+    });
+
+    res.status(200).json({ success: true, message: "Login successful" });
   } catch (error) {
     next(error);
   }
+};
+
+export const logoutController = (_req: Request, res: Response) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false, // same as login (important!)
+    sameSite: "lax",
+  });
+
+  res.status(200).json({ message: "Logged out successfully" });
 };
