@@ -1,5 +1,6 @@
 import * as bcrypt from "bcrypt";
 import { pool } from "../config/database.config.js";
+import { AppError } from "../middleware/error.middleware.js";
 import logger from "../utils/logger.js";
 
 interface CreateUserInput {
@@ -42,4 +43,18 @@ export const createUserService = async (user: CreateUserInput) => {
     `DB query complete - User inserted with ID: ${result.rows[0]?.userId}`,
   );
   return result;
+};
+
+export const deleteUserService = async (userId: string) => {
+  logger.info(`DB query - Fetching user by ID: ${userId}`);
+
+  const result = await pool.query(
+    `DELETE FROM users WHERE "userId" = $1 RETURNING *`,
+    [userId],
+  );
+
+  if (result.rowCount === 0) {
+    throw new AppError(404, "User not found");
+  }
+  return result.rows[0];
 };

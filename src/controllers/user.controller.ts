@@ -3,6 +3,7 @@ import { AppError } from "../middleware/error.middleware.js";
 import { CreateUserInput } from "../schema/user.schema.js";
 import {
   createUserService,
+  deleteUserService,
   getAllUserService,
   getUserService,
 } from "../services/user.service.js";
@@ -80,6 +81,26 @@ export const createUserController = async (
     });
 
     res.status(201).json({ success: true, data: safeUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUserController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { id } = req.params as { id: string };
+
+    const deleteUser = await deleteUserService(id);
+
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+      data: deleteUser,
+    });
   } catch (error) {
     next(error);
   }

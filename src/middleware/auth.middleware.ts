@@ -6,20 +6,18 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction,
 ): void => {
-  const authHeader = req.header("Authorization");
+  const token = req.cookies.token;
 
-  if (!authHeader) {
-    res.status(401).json({ message: "No token provided" });
+  if (!token) {
+    res.status(401).json({ message: "Unauthorized" });
     return;
   }
-  const token = authHeader.replace("Bearer ", "");
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(400).json({ message: "Invalid token" });
+    res.status(401).json({ message: "Invalid token" });
   }
 };
