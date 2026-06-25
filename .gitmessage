@@ -1,0 +1,40 @@
+# <type>(<scope>): <subject>
+#
+# <body>
+#
+# <footer>
+
+# COMMIT TYPE
+# feat:      A new feature
+# fix:       A bug fix
+# refactor:  Code change that neither fixes a bug nor adds a feature
+# test:      Adding or updating tests
+# docs:      Documentation only changes
+# style:     Formatting, linting, whitespace, etc. (no logic changes)
+# perf:      Performance improvements
+# build:     Build system or dependency changes
+# ci:        CI/CD pipeline changes
+# chore:     Maintenance tasks, configs, cleanup
+# revert:    Revert a previous commit
+
+# EXAMPLES
+# feat(auth): add JWT token refresh mechanism
+# fix(user): resolve null pointer exception in getUserById
+# docs(README): update installation instructions
+# style(lint): fix ESLint warnings in auth.service.ts
+# test(product): add unit tests for product controller
+# perf(database): optimize user query with indexing
+# build(deps): upgrade Express to v4.18.0
+# ci(github): add automated test workflow
+# chore(config): update TypeScript configuration
+# revert(auth): revert "feat(auth): add JWT token refresh mechanism"
+
+# GUIDELINES
+# - Use the imperative mood ("add" not "added" or "adds")
+# - Do not capitalize the subject line
+# - Do not end the subject line with a period
+# - Keep the subject line under 50 characters
+# - Separate subject from body with a blank line
+# - Wrap the body at 72 characters
+# - Use the body to explain WHAT and WHY, not HOW
+# - Use the footer for issue references (e.g., Closes #123)
